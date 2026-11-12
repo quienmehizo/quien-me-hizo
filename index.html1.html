@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>¿Quién me hizo? – 12 niveles</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#d54349">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="¿Quién me hizo?">
+<style>
+:root{--bg:#fbf3e0;--card:#fffdf6;--ink:#1f2a44;--mut:#6b7390;--line:#e6d9b8;--ac:#0e8a7d;--ac2:#e2693c;--ok:#2e8b3d;--no:#c8372d;--gold:#e0a21b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a2b;--card:#1d2540;--ink:#f3ecd9;--mut:#a3abc7;--line:#33406a;--ac:#35c2b2;--ac2:#f08a5d;--ok:#5fcf74;--no:#ff7a6e}}
+*{box-sizing:inherit;-webkit-tap-highlight-color:transparent}
+button,select,input{touch-action:manipulation}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.warn{color:var(--no);font-weight:700}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:Georgia,"Iowan Old Style",serif}
+.wrap{max-width:720px;margin:0 auto;padding:18px 16px 28px;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.screen{display:none;flex:1;flex-direction:column;gap:16px;justify-content:center}
+.screen.on{display:flex}
+.center{align-items:center;text-align:center}
+h1{font-size:clamp(2.1rem,8vw,3.3rem);margin:0;line-height:1.05;color:var(--ac)}
+h2{margin:0;font-size:1.5rem}
+.sub{color:var(--mut);margin:0;font-size:1.05rem;max-width:480px}
+.emoji{font-size:4rem}
+input{font:inherit;font-size:1.15rem;padding:13px 16px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);width:min(340px,100%);text-align:center}
+.btn{font:inherit;font-weight:700;font-size:1.1rem;padding:12px 30px;border:0;border-radius:99px;background:var(--ac2);color:#fff;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.btn.alt{background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn:active{transform:translateY(3px)}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.lv{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.lc{font:inherit;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px 10px;text-align:center;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center}
+.lc .n{font-size:1.8rem}.lc .t{font-size:.9rem;line-height:1.2;min-height:2.3em}.lc .s{color:var(--gold);letter-spacing:2px}
+.lc:disabled{opacity:.5;cursor:not-allowed}
+.lc:hover:not(:disabled){border-color:var(--ac)}
+.hud{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.chip{background:var(--card);border:2px solid var(--line);border-radius:99px;padding:6px 14px;font-weight:700;font-size:.95rem}
+.ring{--p:100;width:60px;height:60px;border-radius:50%;background:conic-gradient(var(--ac) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center}
+.ring b{width:46px;height:46px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:1.25rem}
+.steps{display:flex;gap:5px}
+.steps i{flex:1;height:8px;border-radius:9px;background:var(--line)}
+.steps i.done{background:var(--ac)}.steps i.cur{background:var(--gold)}.steps i.miss{background:var(--no);opacity:.6}
+.q{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:22px 20px;font-size:clamp(1.2rem,4vw,1.6rem);font-weight:700;line-height:1.3}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{font:inherit;font-size:clamp(1rem,3.2vw,1.1rem);text-align:left;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:13px 14px;display:flex;gap:12px;align-items:center;cursor:pointer;line-height:1.3}
+.opt:hover:not(:disabled){border-color:var(--ac)}
+.opt .l{flex:none;width:34px;height:34px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-weight:700;font-family:system-ui,sans-serif}
+.opt:nth-child(2) .l{background:var(--ac2)}.opt:nth-child(3) .l{background:var(--gold)}.opt:nth-child(4) .l{background:#7a5bd0}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--card);background:color-mix(in srgb,var(--ok) 18%,var(--card))}
+.opt.wrong{border-color:var(--no);background:var(--card);background:color-mix(in srgb,var(--no) 15%,var(--card))}
+.opt.dim{opacity:.45}
+.fb{font-size:1.8rem;font-weight:800}.fb.ok{color:var(--ok)}.fb.no{color:var(--no)}
+.note{background:var(--card);border:2px dashed var(--line);border-radius:14px;padding:14px 16px;max-width:560px;line-height:1.4}
+.big{font-size:3.2rem;font-weight:800;color:var(--ac2)}
+.stars{font-size:2.4rem;color:var(--gold);letter-spacing:4px}
+.small{font-size:.85rem;color:var(--mut)}
+.code{font-size:clamp(2.2rem,13vw,3.2rem);font-weight:800;letter-spacing:.3em;color:var(--ac2);background:var(--card);border:2px dashed var(--line);border-radius:16px;padding:4px 14px 4px 24px}
+.pl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pl span{background:var(--card);border:2px solid var(--line);border-radius:99px;padding:6px 14px}
+.lb{width:100%;max-width:460px;display:flex;flex-direction:column;gap:8px}
+.lb div{display:flex;justify-content:space-between;gap:10px;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:10px 14px;font-weight:700}
+.lb div.me{border-color:var(--ac2)}
+.vb{width:100%;display:flex;flex-direction:column;gap:14px;align-items:center}
+.vb .opts{width:100%}.vb .opt{cursor:default}
+.vb .opt .c{margin-left:auto;font-weight:800}
+select{font:inherit;font-size:1.05rem;padding:10px 14px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section id="start" class="screen center on">
+  <div class="emoji">📖</div>
+  <h1>¿Quién me hizo?</h1>
+  <p class="sub">12 niveles, uno por capítulo. Responde rápido para ganar más puntos y estrellas. Con 60 % de aciertos abres el siguiente nivel.</p>
+  <input id="name" placeholder="Tu nombre" maxlength="20" autocomplete="off">
+  <div class="row"><button class="btn" id="go">Jugar solo</button><button class="btn alt" id="onl">Jugar en línea</button></div>
+  <button class="btn alt" id="inst" style="display:none">📲 Instalar la app</button>
+  <p class="small" id="insthint" style="display:none"></p>
+</section>
+
+<section id="levels" class="screen">
+  <h2 id="hello"></h2>
+  <div class="lv" id="lv"></div>
+  <div class="row"><button class="btn alt" id="lback">← Inicio</button><button class="btn" id="lonl">🌐 Jugar en línea</button></div>
+  <div class="row"><button class="btn alt" id="unlock">Desbloquear todos</button><button class="btn alt" id="reset">Borrar progreso</button></div>
+</section>
+
+<section id="game" class="screen">
+  <div class="hud"><span class="chip" id="num"></span><div class="ring" id="ring"><b id="t">25</b></div><span class="chip" id="score">0 pts</span></div>
+  <div class="steps" id="steps"></div>
+  <div class="q" id="q"></div>
+  <div class="opts" id="opts"></div>
+</section>
+
+<section id="result" class="screen center">
+  <div class="fb" id="fb"></div>
+  <div class="note" id="note"></div>
+  <span class="chip" id="gain"></span>
+  <button class="btn" id="next">Siguiente</button>
+</section>
+
+<section id="end" class="screen center">
+  <div class="emoji" id="medal"></div>
+  <h1 id="endt"></h1>
+  <div class="stars" id="stars"></div>
+  <div class="big" id="final"></div>
+  <p class="sub" id="summary"></p>
+  <div class="row"><button class="btn" id="nextlv">Siguiente nivel</button><button class="btn alt" id="retry">Repetir</button><button class="btn alt" id="menu">Niveles</button></div>
+</section>
+
+<section id="online" class="screen center">
+  <div class="emoji">🌐</div>
+  <h2>Jugar en línea</h2>
+  <p class="sub">Sin cuenta ni registro. El anfitrión crea la partida y comparte el código de 4 números; los demás abren este mismo enlace, escriben su nombre y el código, y entran.</p>
+  <input id="code" placeholder="Código de partida" inputmode="numeric" maxlength="4" autocomplete="off">
+  <div class="row"><button class="btn" id="join">Unirme</button><button class="btn alt" id="mk">Crear partida</button><button class="btn alt" id="oback">Volver</button></div>
+  <p class="small" id="ost"></p>
+</section>
+
+<section id="hostv" class="screen center"><div class="vb" id="hbody"></div></section>
+<section id="plv" class="screen center"><div class="vb" id="pbody"></div></section>
+
+</div>
+<script>
+// Cada nivel: [número de pregunta, pregunta, respuesta]
+const C=[
+{e:"🌍",t:"Dios nos creó",q:[
+[1,"¿Quién te creó?","Dios"],
+[2,"¿Qué más ha creado Dios?","Todo lo que existe"],
+[3,"¿Para qué te creó Dios a ti y a todos los demás?","Para su gloria"],
+[4,"¿Cómo puedes glorificar a Dios?","Amándole y haciendo todo lo que él me manda"],
+[5,"¿Por qué debes glorificar a Dios?","Porque él me creó, me conserva y salva"],
+[14,"¿Dónde aprendes a obedecer y amar a Dios?","Solamente en la Biblia"],
+[15,"¿Quién escribió la Biblia?","Unos santos varones inspirados por el Espíritu Santo"]]},
+{e:"✨",t:"El Dios verdadero",q:[
+[6,"¿Hay más de un Dios?","No, solo hay uno y verdadero"],
+[7,"¿En cuántas personas existe este único Dios?","En tres personas iguales"],
+[8,"¿Cuáles son las tres personas?","El Padre, el Hijo y el Espíritu Santo"],
+[9,"¿Qué es Dios?","Espíritu, sin cuerpo sensible como el de los hombres"],
+[10,"¿En dónde está Dios?","En todas partes"],
+[11,"¿Puedes ver a Dios?","Yo no puedo verlo, pero él me mira continuamente"],
+[13,"¿Qué puede hacer Dios?","Todo, conforme a su santa voluntad"]]},
+{e:"🌳",t:"Adán y Eva",q:[
+[16,"¿Quiénes fueron nuestros primeros padres?","Adán y Eva"],
+[17,"¿De qué formó Dios a Adán y a Eva?","El cuerpo de Adán, del polvo de la tierra; a Eva, del cuerpo de Adán"],
+[18,"¿Qué dio Dios a Adán y a Eva además de cuerpos?","Almas inmortales"],
+[20,"¿Cómo sabes que tienes alma?","Porque puedo pensar en Dios y en el mundo venidero"],
+[21,"¿En qué estado creó Dios a Adán y a Eva?","Santos y felices"],
+[22,"¿Qué cosa es un pacto o alianza?","Un concierto hecho entre dos o más personas"],
+[23,"¿Qué alianza hizo Dios con Adán?","La alianza de obras"],
+[24,"¿Qué obligación asumió Adán en la alianza de obras?","La obediencia perfecta a Dios"]]},
+{e:"🍎",t:"El pecado entra al mundo",q:[
+[25,"¿Qué prometió Dios en la alianza de obras?","Premiar con la vida a Adán si continuaba en la obediencia"],
+[26,"¿Qué amenaza hizo Dios en la alianza de obras?","El castigo de muerte si faltaba a la obediencia"],
+[28,"¿Qué es el pecado?","La falta de conformidad con la ley de Dios, o la transgresión de ella"],
+[29,"¿Qué quiere decir falta de conformidad?","No vivir ni obrar en conformidad con la voluntad de Dios"],
+[30,"¿Qué significa “transgresión”?","Hacer lo que Dios ha prohibido"],
+[31,"¿Cuál fue el pecado de nuestros primeros padres?","Comer del fruto prohibido"],
+[32,"¿Quién les indujo a este pecado?","El diablo tentó a Eva, y ella le dio del fruto a Adán"],
+[33,"¿Qué les sucedió después de pecar?","Vinieron a ser culpables y miserables"]]},
+{e:"💔",t:"Nuestra naturaleza pecadora",q:[
+[34,"¿A quiénes representó Adán en la alianza de obras?","A toda su posteridad"],
+[35,"¿Qué efecto tuvo el pecado de Adán en todos?","Todo el género humano nace en estado de pecado y de miseria"],
+[36,"¿Cómo se llama la naturaleza pecaminosa que heredamos de Adán?","Pecado original"],
+[37,"¿Qué merece todo pecado?","La ira y maldición de Dios"],
+[38,"¿Qué necesitamos para entrar al cielo?","Una mudanza de corazón"],
+[39,"¿Cómo se llama el cambio de corazón?","Regeneración"],
+[40,"¿Quién puede cambiar el corazón del pecador?","Solo el Espíritu Santo, a través de las Escrituras"],
+[41,"¿Quién puede salvarse por la alianza de obras?","Nadie"],
+[42,"¿Por qué nadie puede salvarse por la alianza de obras?","Porque todos la han quebrantado y están condenados por ella"]]},
+{e:"🕊️",t:"La alianza de gracia",q:[
+[43,"¿Con quién hizo Dios Padre la alianza de gracia?","Con Cristo, su Hijo eterno"],
+[44,"¿A quiénes presentó Cristo la alianza de gracia?","A su pueblo elegido"],
+[45,"¿Qué obligaciones asumió Cristo en la alianza de gracia?","Guardar por su pueblo toda la ley y sufrir el castigo que ellos merecían"],
+[46,"¿Cómo fue nuestro Señor Jesucristo?","Santo, inocente y libre de mancha"],
+[47,"¿Cómo pudo sufrir el Hijo de Dios?","Se hizo hombre para poder obedecer y sufrir"],
+[48,"¿Qué es la expiación?","La satisfacción que hizo Cristo, en lugar de los pecadores, de la justicia divina"],
+[49,"¿Qué prometió Dios Padre en la alianza de gracia?","La justificación y la santificación de aquellos por quienes Cristo moriría"],
+[50,"¿Qué es “justificación”?","La obra por la que Dios perdona a los pecadores y los trata como si no hubieran pecado"],
+[51,"¿Qué es “santificación”?","La obra de Dios que hace santos en conducta y corazón a los que antes eran pecadores"]]},
+{e:"✝️",t:"Cristo y la salvación",q:[
+[52,"¿Para quiénes obedeció y padeció Cristo?","Para aquellos que el Padre le había dado"],
+[53,"¿Qué vida llevó Cristo en este mundo?","Una vida de pobreza y de padecimientos"],
+[54,"¿De qué manera murió Cristo?","De la penosa e ignominiosa muerte en la cruz"],
+[55,"¿Quiénes han de ser salvados?","Los que tienen fe en Jesucristo, se arrepienten y obedecen su voluntad"],
+[56,"¿Qué es “arrepentirse”?","Sentir el pecado, aborrecerlo y abandonarlo"],
+[57,"¿Qué es “creer y tener fe en Jesucristo”?","Confiar en Cristo para la salvación"],
+[58,"¿Puedes arrepentirte y creer en Cristo por tus propios esfuerzos?","No, no puedo hacer nada bueno sin la ayuda del Espíritu Santo"],
+[59,"¿Cómo puedes tener la ayuda del Espíritu Santo?","Pidiéndole a Dios que nos lo envíe"]]},
+{e:"👑",t:"Profeta, sacerdote y rey",q:[
+[61,"¿Cómo se salvaron los justos que vivieron antes de Cristo?","Por la fe en un Salvador que había de venir"],
+[62,"¿Cómo mostraron esa fe?","Ofreciendo sacrificios en el altar de Dios"],
+[63,"¿A quién simbolizaban esos sacrificios?","A Cristo, el Cordero de Dios"],
+[64,"¿Cuántos oficios tiene Cristo?","Tres"],
+[65,"¿Cuáles son los oficios de Cristo?","Profeta, Sacerdote y Rey"],
+[66,"¿Cómo ejecuta Cristo el oficio de Profeta?","Enseñándonos la voluntad de Dios para nuestra salvación"],
+[67,"¿Cómo ejecuta Cristo el oficio de Sacerdote?","Habiendo muerto e intercediendo continuamente por nosotros"],
+[68,"¿Cómo ejecuta Cristo el oficio de Rey?","Gobernándonos y defendiéndonos"]]},
+{e:"📜",t:"Los diez mandamientos",q:[
+[69,"¿Por qué necesitas a Cristo como Profeta?","Porque soy ignorante"],
+[70,"¿Por qué necesitas a Cristo como Sacerdote?","Porque soy culpable"],
+[71,"¿Por qué necesitas a Cristo como Rey?","Porque soy débil y sin socorro"],
+[72,"¿Cuántos mandamientos dio Dios en el monte Sinaí?","Diez"],
+[73,"¿Qué nombre se da a veces a los diez mandamientos?","El Decálogo"],
+[74,"¿Qué nos enseñan los primeros cuatro mandamientos?","Nuestros deberes para con Dios"],
+[75,"¿Qué nos enseñan los últimos seis mandamientos?","Nuestros deberes para con los demás hombres"],
+[76,"¿Cuál es el resumen de los diez mandamientos?","Amar a Dios con todo mi corazón y a mi prójimo como a mí mismo"],
+[77,"¿Quién es tu prójimo?","Todo ser humano"]]},
+{e:"⚖️",t:"Los mandamientos, uno por uno",q:[
+[81,"¿Qué nos enseña el primer mandamiento?","A dar culto solo a Dios y reconocerle como único Dios verdadero"],
+[83,"¿Qué nos enseña el segundo mandamiento?","A dar culto puro a Dios según lo establecido y a huir de la idolatría"],
+[85,"¿Qué nos enseña el tercer mandamiento?","A usar con reverencia el nombre, la palabra y las obras de Dios"],
+[87,"¿Qué nos enseña el cuarto mandamiento?","A santificar el día de descanso"],
+[89,"¿Por qué se llama al domingo “Día del Señor”?","Porque en este día Cristo resucitó de los muertos"],
+[92,"¿Qué nos enseña el quinto mandamiento?","Amar y obedecer a nuestros padres e instructores"],
+[94,"¿Qué nos enseña el sexto mandamiento?","Que debemos vencer la pasión de la ira"],
+[98,"¿Qué nos enseña el octavo mandamiento?","A ser honrados y trabajadores"],
+[100,"¿Qué nos enseña el noveno mandamiento?","A hablar con la verdad"],
+[102,"¿Qué nos enseña el décimo mandamiento?","A contentarnos con lo que el Señor nos da y ser agradecidos"]]},
+{e:"🙏",t:"La oración",q:[
+[104,"¿Para qué nos sirven los diez mandamientos?","Para frenarnos, enseñarnos nuestros deberes y mostrarnos que necesitamos un Salvador"],
+[105,"¿Qué es la oración?","Exponer con corazón y labios nuestras peticiones a Dios, alabarlo y darle gracias"],
+[106,"¿En nombre de quién debemos orar?","Solo en nombre de Cristo"],
+[107,"¿Qué modelo nos dio Cristo para enseñarnos a orar?","El Padre Nuestro"],
+[109,"¿Cuántas peticiones hay en la oración del Señor?","Seis"],
+[113,"¿Qué rogamos en la petición “Venga tu reino”?","Que el evangelio sea predicado en todo el mundo y todos lo crean y obedezcan"],
+[115,"¿Qué rogamos en la petición “Hágase tu voluntad”?","Que los hombres sirvan a Dios así como los ángeles en el cielo"],
+[117,"¿Qué rogamos en la petición “El pan nuestro de cada día”?","Que Dios nos dé todo lo que necesitamos para el cuerpo y para el alma"],
+[121,"¿Qué rogamos en la petición “Líbranos del mal”?","Que Dios nos conserve libres de todo pecado"]]},
+{e:"🍞",t:"Sacramentos y vida eterna",q:[
+[122,"¿Cuántos sacramentos hay?","Dos"],
+[123,"¿Cuáles son los sacramentos?","El bautismo y la Cena del Señor"],
+[127,"¿Qué significa el agua del bautismo?","Que por la sangre de Cristo somos purificados del pecado"],
+[133,"¿Qué es la Cena del Señor?","Comer pan y beber vino en memoria de los padecimientos de Cristo"],
+[134,"¿Qué se representa con el pan?","El cuerpo de Cristo, destrozado por nuestros pecados"],
+[135,"¿Qué se representa con el vino?","La sangre de Cristo, derramada para nuestra salvación"],
+[137,"¿Cuándo resucitó Cristo?","Al tercer día después de su muerte"],
+[138,"¿Dónde está Cristo ahora?","En el cielo, intercediendo por los pecadores"],
+[139,"¿Para qué vendrá Cristo otra vez?","Para juzgar al mundo el último día"],
+[145,"¿Qué es el cielo?","Un lugar lleno de gloria donde los justos gozarán para siempre de la presencia del Señor"]]}
+];
+const TIME=25,LET=["A","B","C","D"],KEY="qmh-progreso";
+const $=id=>document.getElementById(id);
+let prog={},lv,deck,i,score,streak,right,tleft,tick,locked,ci,marks,player="";
+try{prog=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(prog))}catch(e){}}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id))}
+function shuffle(a){a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a}
+const starsOf=p=>p>=.9?3:p>=.75?2:p>=.6?1:0;
+const unlocked=n=>n===0||prog.all||(prog[n-1]&&prog[n-1].s>0);
+
+function menu(){
+  $("hello").textContent=(player?player+", elige":"Elige")+" un nivel";
+  const box=$("lv");box.innerHTML="";
+  C.forEach((c,n)=>{
+    const b=document.createElement("button");b.className="lc";b.disabled=!unlocked(n);
+    const st=prog[n]?prog[n].s:0;
+    b.innerHTML='<span class="n">'+(b.disabled?"🔒":c.e)+'</span><b>Nivel '+(n+1)+'</b><span class="t"></span><span class="s">'+"★".repeat(st)+"☆".repeat(3-st)+'</span>';
+    b.querySelector(".t").textContent=c.t;
+    b.onclick=()=>play(n);box.appendChild(b);
+  });
+  show("levels");
+}
+
+function play(n){lv=n;deck=shuffle(C[n].q);i=0;score=0;streak=0;right=0;marks=[];$("score").textContent="0 pts";ask()}
+function steps(){$("steps").innerHTML=deck.map((_,k)=>'<i class="'+(marks[k]||(k===i?"cur":""))+'"></i>').join("")}
+
+// Grupos de respuestas del mismo tipo, para que las opciones falsas sean creíbles
+const GR=[["Dios","Adán y Eva","Todo ser humano","Nadie","Cristo, su Hijo eterno","Los ángeles","Moisés y los profetas","El Espíritu Santo"],
+["Uno","Dos","Tres","Cuatro","Seis","Siete","Diez","Doce"],
+["Al tercer día después de su muerte","Al séptimo día después de su muerte","Al día siguiente de su muerte","A los cuarenta días de su muerte"],
+["En todas partes","Solo en el cielo","En el templo de Jerusalén","Donde dos o tres se reúnen"],
+["Profeta, Sacerdote y Rey","Juez, Pastor y Maestro","Profeta, Rey y Siervo","Sacerdote, Maestro y Soldado"]];
+function buildOpts(it,l,rnd){
+  const a=it[2],g=GR.find(x=>x.includes(a));let pool;
+  if(g)pool=g.filter(x=>x!==a);
+  else{
+    const w=s=>s.toLowerCase().split(/[^a-záéíóúñ]+/).filter(z=>z.length>3),wa=w(a);
+    const own=C[l].q.map(y=>y[2]);
+    const sc=x=>(own.includes(x)?15:0)+w(x).filter(z=>wa.includes(z)).length*20-Math.abs(x.length-a.length);
+    pool=C.flatMap(c=>c.q).map(x=>x[2]).filter((x,k,s)=>x!==a&&s.indexOf(x)===k).sort((p,q)=>sc(q)-sc(p)).slice(0,7);
+  }
+  const sh=arr=>{arr=arr.slice();for(let k=arr.length-1;k>0;k--){const j=Math.floor(rnd()*(k+1));[arr[k],arr[j]]=[arr[j],arr[k]]}return arr};
+  return sh([{t:a,ok:true}].concat(sh(pool).slice(0,3).map(t=>({t,ok:false}))));
+}
+
+function ask(){
+  const it=deck[i];
+  const opts=buildOpts(it,lv,Math.random);
+  ci=opts.findIndex(o=>o.ok);
+  $("num").textContent="Nivel "+(lv+1)+" · "+(i+1)+"/"+deck.length;
+  $("q").textContent=it[1];
+  const box=$("opts");box.innerHTML="";
+  opts.forEach((o,k)=>{
+    const b=document.createElement("button");b.className="opt";
+    b.innerHTML='<span class="l">'+LET[k]+'</span><span></span>';
+    b.lastChild.textContent=o.t;b.onclick=()=>pick(k);box.appendChild(b);
+  });
+  steps();locked=false;show("game");
+  clearInterval(tick);const t0=Date.now();
+  tick=setInterval(()=>{
+    tleft=Math.max(0,TIME-(Date.now()-t0)/1000);
+    $("t").textContent=Math.ceil(tleft);
+    $("ring").style.setProperty("--p",tleft/TIME*100);
+    if(tleft<=0){clearInterval(tick);pick(-1)}
+  },100);
+}
+
+function pick(k){
+  if(locked)return;locked=true;clearInterval(tick);
+  const ok=k===ci;let gain=0;
+  if(ok){streak++;right++;gain=Math.round(400+600*(tleft/TIME))+(streak>=3?100*Math.min(streak-2,5):0);score+=gain}else streak=0;
+  marks[i]=ok?"done":"miss";
+  document.querySelectorAll(".opt").forEach((b,x)=>{
+    b.disabled=true;
+    if(x===ci)b.classList.add("right");else if(x===k)b.classList.add("wrong");else b.classList.add("dim");
+  });
+  $("score").textContent=score+" pts";steps();
+  setTimeout(()=>{
+    const f=$("fb");f.className="fb "+(ok?"ok":"no");
+    f.textContent=ok?"¡Correcto! ✓":(k<0?"¡Se acabó el tiempo! ⏰":"Casi… ✗");
+    $("note").textContent="Respuesta: "+deck[i][2]+" (pregunta "+deck[i][0]+")";
+    $("gain").textContent=ok?"+"+gain+" puntos"+(streak>=3?" · 🔥 racha de "+streak:""):"+0 puntos";
+    $("next").textContent=i===deck.length-1?"Ver resultado":"Siguiente";
+    show("result");
+  },1000);
+}
+
+function finish(){
+  const p=right/deck.length,s=starsOf(p);
+  const old=prog[lv]||{s:0,b:0};
+  prog[lv]={s:Math.max(old.s,s),b:Math.max(old.b,score)};save();
+  $("endt").textContent=s>0?"¡Nivel "+(lv+1)+" superado!":"Nivel "+(lv+1)+": ¡inténtalo de nuevo!";
+  $("medal").textContent=s===3?"🏆":s>0?"🎉":"🌱";
+  $("stars").textContent="★".repeat(s)+"☆".repeat(3-s);
+  $("final").textContent=score+" pts";
+  $("summary").textContent=right+" de "+deck.length+" correctas. "+(s>0?"Mejor puntaje: "+prog[lv].b+".":"Necesitas 60 % para pasar.");
+  $("nextlv").style.display=s>0&&lv<C.length-1?"":"none";
+  show("end");
+}
+
+$("go").onclick=()=>{player=$("name").value.trim();menu()};
+$("name").addEventListener("keydown",e=>{if(e.key==="Enter")$("go").click()});
+$("next").onclick=()=>{i++;i<deck.length?ask():finish()};
+$("nextlv").onclick=()=>play(lv+1);
+$("retry").onclick=()=>play(lv);
+$("menu").onclick=menu;
+$("unlock").onclick=()=>{prog.all=true;save();menu()};
+$("reset").onclick=()=>{prog={};save();menu()};
+
+// ================= MODO EN LÍNEA (sin inicio de sesión) =================
+// Usa una base de datos privada de Firebase (Realtime Database), solo para este juego.
+// Pega aquí la URL de tu base de datos (termina en firebaseio.com o firebasedatabase.app):
+const FB_URL="https://quien-me-hizo-default-rtdb.firebaseio.com";
+const SDK="https://www.gstatic.com/firebasejs/10.14.1/";
+const NS="quien-me-hizo-catecismo/v2/";
+const ONT=20,STALE=15000;
+let cli=null,role=null,code=null,st=null,pst=null,tmr=null,beat=null,pbeat=null,watch=null,findT=null;
+let nocfg=false,hid=null,pn=0,blocked=false,qStart=0,pq=-1,mine=null,pscore=0,myId=null,myName="",peers={},lastHost=0,lost=false,hLeft=ONT,wl=null;
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const ost=m=>{$("ost").textContent=m||""};
+const T=s=>NS+code+"/"+s;
+const rid=()=>Math.random().toString(36).slice(2,10);
+const mul=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+function pub(topic,obj,retain){if(cli)cli.publish(topic,obj==null?"":JSON.stringify(obj),{qos:1,retain:!!retain})}
+function parse(buf){const s=buf.toString();if(!s)return null;try{return JSON.parse(s)}catch(e){return undefined}}
+async function keepAwake(){try{if(navigator.wakeLock&&!wl){wl=await navigator.wakeLock.request("screen");wl.addEventListener("release",()=>{wl=null})}}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&role)keepAwake()});
+
+addEventListener("securitypolicyviolation",e=>{blocked=true});
+let fbReady=null;
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+function loadFB(){
+  if(!fbReady)fbReady=(async()=>{
+    if(!window.firebase){await loadScript(SDK+"firebase-app-compat.js");await loadScript(SDK+"firebase-database-compat.js")}
+    const app=firebase.apps.length?firebase.app():firebase.initializeApp({databaseURL:FB_URL});
+    return firebase.database(app);
+  })().catch(e=>{fbReady=null;throw e});
+  return fbReady;
+}
+const P=t=>"qmh/"+t.slice(NS.length).replace(/\/$/,"");
+let srvOff=0;
+const srvNow=()=>Date.now()+srvOff;
+function fbClient(db,will){
+  const ev={},subs={};let connected=false;
+  const offRef=db.ref(".info/serverTimeOffset"),onOff=s=>{srvOff=+s.val()||0};offRef.on("value",onOff);
+  const fail=err=>emit("error",err);
+  const emit=(e,...a)=>(ev[e]||[]).slice().forEach(f=>{try{f(...a)}catch(x){console.error(x)}});
+  const info=db.ref(".info/connected");
+  const onInfo=s=>{const was=connected;connected=!!s.val();if(connected&&!was){if(will)db.ref(P(will.topic)).onDisconnect().remove().catch(()=>{});emit("connect")}};
+  const api={cs:[db],get connected(){return connected},
+    on(e,f){(ev[e]=ev[e]||[]).push(f);return api},
+    once(e,f){const g=(...a)=>{api.removeListener(e,g);f(...a)};return api.on(e,g)},
+    removeListener(e,f){ev[e]=(ev[e]||[]).filter(x=>x!==f);return api},
+    publish(t,m){const r=db.ref(P(t));(m==null||m==="")?r.remove().catch(()=>{}):r.set(String(m)).catch(fail)},
+    subscribe(t){[].concat(t).forEach(tp=>{
+      if(subs[tp])return;
+      if(tp.endsWith("/+")){
+        const base=tp.slice(0,-1),r=db.ref(P(base));
+        const add=s=>emit("message",base+s.key,String(s.val()==null?"":s.val())),rem=s=>emit("message",base+s.key,"");
+        r.on("child_added",add,fail);r.on("child_changed",add,fail);r.on("child_removed",rem,fail);subs[tp]=()=>r.off();
+      }else{const r=db.ref(P(tp)),f=s=>emit("message",tp,String(s.val()==null?"":s.val()));r.on("value",f,fail);subs[tp]=()=>r.off("value",f)}
+    })},
+    unsubscribe(t){[].concat(t).forEach(tp=>{if(subs[tp]){subs[tp]();delete subs[tp]}})},
+    end(){Object.keys(subs).forEach(k=>subs[k]());info.off("value",onInfo);offRef.off("value",onOff);if(will)db.ref(P(will.topic)).onDisconnect().cancel().catch(()=>{})},
+    count(){return connected?1:0}};
+  info.on("value",onInfo);
+  return api;
+}
+async function connectAll(will){
+  if(!/^https:\/\/[^"]+$/.test(FB_URL)||FB_URL.indexOf("__")>=0){nocfg=true;return null}
+  let db;try{db=await loadFB()}catch(e){return null}
+  const c=fbClient(db,will);
+  if(c.connected)return c;
+  return new Promise(res=>{const t=setTimeout(()=>{c.end();res(null)},12000);c.once("connect",()=>{clearTimeout(t);res(c)})});
+}
+const denyMsg="Firebase rechazó la conexión (permiso denegado). Revisa en Firebase → Realtime Database → Reglas que estén pegadas las reglas del juego y toca Publicar.";
+function onFbError(e){const s=String(e&&(e.code||e.message)||e);console.warn("Firebase:",s);if(/permission|denied/i.test(s)&&role)leaveGame(denyMsg)}
+function failMsg(){
+  if(nocfg)return "Falta configurar la base de datos del juego (FB_URL).";
+  const inFrame=(()=>{try{return window.self!==window.top}catch(e){return true}})();
+  if(blocked||inFrame)return "Esta vista previa bloquea las conexiones en línea. Abre el juego desde su enlace web en el navegador (Chrome o Safari), no desde la vista previa de archivos.";
+  return "No se pudo conectar con el servidor del juego. Revisa tu conexión a internet e intenta de nuevo.";
+}
+
+
+function cur(s){
+  const [l,i]=String(s.deck[s.qi]).split(".").map(Number);
+  const it=C[l].q[i];
+  return {it,opts:buildOpts(it,l,mul(s.seed*131+s.qi*7919))};
+}
+function players(){
+  const now=Date.now();
+  return Object.keys(peers).filter(id=>now-peers[id].seen<STALE).map(id=>{const p=peers[id];return {id,isMe:id===myId,name:String(p.name||"Jugador").slice(0,20),score:+p.score||0,a:p.a}});
+}
+function lbox(ps,top){
+  const d=el("div","lb");
+  ps.slice().sort((a,b)=>b.score-a.score).slice(0,top).forEach((p,k)=>{const r=el("div",p.isMe?"me":"");r.append(el("span","",(k+1)+". "+p.name),el("span","",p.score+" pts"));d.append(r)});
+  return d;
+}
+function onPeerMsg(topic,buf){
+  const id=topic.split("/").pop(),d=parse(buf);
+  if(d===null){delete peers[id];return true}
+  if(!d||typeof d!=="object")return false;
+  const old=peers[id];if(old&&(+d.n||0)<=old.n){old.seen=Date.now();return false}
+  peers[id]={name:d.name,score:d.score,a:d.a,n:+d.n||0,seen:Date.now()};return true;
+}
+function leaveGame(msg){
+  [tmr,beat,pbeat,watch].forEach(x=>clearInterval(x));clearTimeout(findT);
+  const c=cli;
+  if(c){
+    if(role==="h"&&code){pub(T("st"),{ph:"closed",code,hid,n:(st&&st.n||0)+1,deck:[],qi:0,ts:srvNow()},true)}
+    else if(role==="p"&&code&&myId){pub(T("p/"+myId),null,true)}
+    setTimeout(()=>{try{c.end()}catch(e){}},300);
+  }
+  try{if(wl)wl.release()}catch(e){}
+  cli=null;role=null;code=null;st=null;pst=null;mine=null;pscore=0;pq=-1;peers={};lost=false;
+  ost(msg||"");show("online");
+}
+
+// ---- Anfitrión ----
+function codeBusy(c,cd){
+  return new Promise(res=>{
+    const tp=NS+cd+"/st";let busy=false;
+    const h=(topic,buf)=>{if(topic!==tp)return;const d=parse(buf);if(d&&d.ph&&d.ph!=="closed"&&Math.abs(srvNow()-(+d.ts||0))<600000)busy=true};
+    c.on("message",h);c.subscribe(tp);
+    setTimeout(()=>{c.removeListener("message",h);c.unsubscribe(tp);res(busy)},1200);
+  });
+}
+function emitState(){if(cli&&role==="h"){st.ts=srvNow();pub(T("st"),st,true)}}
+function hset(p){st=Object.assign({},st,p,{n:(st.n||0)+1});emitState();hrender()}
+async function hostGame(){
+  ost("Conectando…");keepAwake();$("mk").disabled=true;
+  const c=await connectAll();
+  $("mk").disabled=false;
+  if(!c){ost(failMsg());return}
+  let cd=null;
+  for(let k=0;k<6&&!cd;k++){const n=String(1000+Math.floor(Math.random()*9000));if(!(await codeBusy(c,n)))cd=n}
+  if(!cd)cd=String(1000+Math.floor(Math.random()*9000));
+  cli=c;role="h";code=cd;cli.on("error",onFbError);peers={};myId=null;hid=rid();
+  st={ph:"lobby",code:cd,hid,n:1,seed:Math.floor(Math.random()*1e6),lv:-1,deck:[],qi:0};
+  let lastN=0;
+  cli.on("message",(topic,buf)=>{
+    if(role!=="h"||!topic.startsWith(T("p/")))return;
+    if(onPeerMsg(topic,buf)){if(st.ph!=="q")hrender();else hcount()}
+  });
+  cli.on("connect",()=>{if(role==="h"){emitState();if(st.ph==="lobby")hrender()}});
+  cli.subscribe(T("p/+"));
+  beat=setInterval(()=>{emitState();const n=players().length;if(n!==lastN){lastN=n;st.ph==="q"?hcount():hrender()}},3000);
+  emitState();ost("");hrender();show("hostv");
+}
+function startHost(){
+  const ids=C.flatMap((c,l)=>c.q.map((_,i)=>l+"."+i)).filter(x=>st.lv<0||+x.split(".")[0]===st.lv);
+  st=Object.assign({},st,{deck:shuffle(ids).slice(0,10),qi:0,seed:Math.floor(Math.random()*1e6)});
+  Object.keys(peers).forEach(id=>{peers[id].a=null});
+  nextQ(0);
+}
+function nextQ(qi){
+  clearInterval(tmr);hLeft=ONT;
+  hset({ph:"q",qi});
+  const t0=Date.now();
+  tmr=setInterval(()=>{
+    hLeft=Math.max(0,ONT-(Date.now()-t0)/1000);const t=$("ht");if(t)t.textContent=Math.ceil(hLeft);
+    const ps=players();
+    if(hLeft<=0||(ps.length&&ps.every(p=>p.a&&p.a.q===st.qi))){clearInterval(tmr);hset({ph:"rev"})}
+  },250);
+}
+function hcount(){const e=$("hcnt");if(e){const ps=players();e.textContent=ps.filter(p=>p.a&&p.a.q===st.qi).length+" de "+ps.length+" han respondido"}}
+function hrender(){
+  if(role!=="h")return;
+  const b=$("hbody");b.innerHTML="";const ps=players();
+  if(st.ph==="lobby"){
+    b.append(el("p","sub","Código de la partida"),el("div","code",st.code),el("p","sub","Los jugadores abren este mismo enlace → Jugar en línea → escriben el código. No necesitan cuenta."));
+    const w=el("div","pl");ps.forEach(p=>w.append(el("span","",p.name)));
+    b.append(w,el("p","small",ps.length+" jugador(es) conectados"));
+    const s=el("select");s.append(new Option("Todos los niveles (mezcla)",-1));
+    C.forEach((c,n)=>s.append(new Option("Nivel "+(n+1)+": "+c.t,n)));
+    s.value=st.lv;s.onchange=()=>{st.lv=+s.value;emitState()};
+    const go=el("button","btn","Empezar (10 preguntas)");go.disabled=!ps.length;go.onclick=startHost;
+    const x=el("button","btn alt","Cancelar");x.onclick=()=>leaveGame();
+    b.append(s,el("div","row")),b.lastChild.append(go,x);
+  }else if(st.ph==="q"||st.ph==="rev"){
+    const o=cur(st),rev=st.ph==="rev";
+    b.append(el("span","chip","Partida "+st.code+" · Pregunta "+(st.qi+1)+" de "+st.deck.length));
+    if(!rev){const t=el("div","big",String(Math.ceil(hLeft)));t.id="ht";b.append(t)}
+    b.append(el("div","q",o.it[1]));
+    const w=el("div","opts");
+    o.opts.forEach((x,k)=>{
+      const d=el("div","opt"+(rev?(x.ok?" right":" dim"):""));
+      d.append(el("span","l",LET[k]),el("span","",x.t));
+      if(rev)d.append(el("span","c",String(ps.filter(p=>p.a&&p.a.q===st.qi&&p.a.k===k).length)));
+      w.append(d);
+    });
+    b.append(w);
+    if(!rev){const c=el("p","sub");c.id="hcnt";b.append(c)}
+    else{
+      b.append(lbox(ps,5));
+      const last=st.qi===st.deck.length-1;
+      const n=el("button","btn",last?"Ver podio":"Siguiente pregunta");
+      n.onclick=()=>last?hset({ph:"end"}):nextQ(st.qi+1);b.append(n);
+    }
+  }else{
+    b.append(el("div","emoji","🏆"),el("h1","","¡Podio final!"),lbox(ps,8));
+    const x=el("button","btn","Cerrar partida");x.onclick=()=>{leaveGame();show("start")};b.append(x);
+  }
+  if(st.ph==="q"||st.ph==="rev"){const e=el("button","btn alt","Salir de la partida");e.onclick=()=>{if(e.dataset.s){leaveGame()}else{e.dataset.s="1";e.textContent="¿Seguro? Toca otra vez";setTimeout(()=>{e.dataset.s="";e.textContent="Salir de la partida"},3000)}};b.append(e)}
+  hcount();
+}
+
+// ---- Jugador ----
+function sendPresence(){if(role==="p")pub(T("p/"+myId),{n:++pn,name:myName,score:pscore,a:mine?{q:mine.q,k:mine.k,ok:mine.ok?1:0}:null},true)}
+async function joinGame(){
+  const c=$("code").value.trim();
+  if(!/^\d{4}$/.test(c)){ost("Escribe el código de 4 números.");return}
+  myName=(player||"").trim()||"Jugador"+Math.floor(Math.random()*90+10);
+  myId="p"+rid();
+  ost("Conectando…");$("join").disabled=true;
+  const cc=await connectAll({topic:NS+c+"/p/"+myId,payload:"",retain:true});
+  $("join").disabled=false;
+  if(!cc){ost(failMsg());return}
+  cli=cc;role="p";code=c;cli.on("error",onFbError);pscore=0;mine=null;pq=-1;pst=null;peers={};lastHost=0;lost=false;
+  keepAwake();
+  cli.on("message",(topic,buf)=>{
+    if(role!=="p")return;
+    if(topic===T("st")){
+      const s=parse(buf);
+      if(!s||!Array.isArray(s.deck)||!s.ph)return;
+      if(s.ph!=="closed"&&Math.abs(srvNow()-(+s.ts||0))>600000)return;
+      if(pst&&s.hid&&s.hid===pst.hid&&(+s.n||0)<(+pst.n||0))return;
+      lastHost=Date.now();
+      if(s.ph==="q"&&s.qi!==pq){pq=s.qi;qStart=performance.now()}
+      const changed=!pst||pst.ph!==s.ph||pst.qi!==s.qi||lost;
+      if(s.ph==="lobby"&&pst&&pst.ph!=="lobby"){pscore=0;mine=null;sendPresence()}
+      lost=false;pst=s;if(changed)prender();
+    }else if(topic.startsWith(T("p/"))){
+      if(onPeerMsg(topic,buf)&&pst&&(pst.ph==="rev"||pst.ph==="end"||pst.ph==="lobby"))prender();
+    }
+  });
+  cli.on("connect",()=>{if(role==="p")sendPresence()});
+  cli.subscribe([T("st"),T("p/+")]);
+  sendPresence();pbeat=setInterval(sendPresence,5000);
+  findT=setTimeout(()=>{if(role==="p"&&!pst)leaveGame("No se encontró la partida "+c+". Revisa el código y que todos usen el mismo enlace del juego.")},12000);
+  watch=setInterval(()=>{
+    if(role!=="p"||!pst||pst.ph==="end"||pst.ph==="closed")return;
+    const l=Date.now()-lastHost>12000;if(l!==lost){lost=l;prender()}
+  },2000);
+  prender();show("plv");
+}
+function answer(k,o){
+  if(!pst||pst.ph!=="q"||(mine&&mine.q===pst.qi))return;
+  const ms=(performance.now()-qStart)/1000;if(ms>ONT+1)return;
+  const ok=o.opts[k].ok,pts=ok?Math.round(400+600*Math.max(0,1-ms/ONT)):0;
+  pscore+=pts;mine={q:pst.qi,k,ok,pts};
+  sendPresence();prender();
+}
+function prender(){
+  if(role!=="p")return;
+  const b=$("pbody");b.innerHTML="";const s=pst;
+  if(lost)b.append(el("p","small warn","⚠️ Reconectando con el anfitrión…"));
+  if(!s){b.append(el("div","emoji","⏳"),el("p","sub","Buscando la partida "+code+"…"))}
+  else if(s.ph==="closed"){b.append(el("div","emoji","🚪"),el("h2","","El anfitrión cerró la partida"))}
+  else if(s.ph==="lobby"){
+    b.append(el("div","emoji","🎉"),el("h2","","¡Estás dentro, "+myName+"!"),el("p","sub","Espera a que el anfitrión empiece la partida "+s.code+"."));
+    const w=el("div","pl");players().forEach(p=>w.append(el("span","",p.name)));b.append(w);
+  }
+  else if(s.ph==="q"){
+    const o=cur(s),done=mine&&mine.q===s.qi;
+    b.append(el("span","chip","Pregunta "+(s.qi+1)+" de "+s.deck.length),el("div","q",o.it[1]));
+    const w=el("div","opts");
+    o.opts.forEach((x,k)=>{
+      const bt=el("button","opt");bt.append(el("span","l",LET[k]),el("span","",x.t));
+      if(done){bt.disabled=true;if(mine.k===k)bt.style.borderColor="var(--ac)";else bt.classList.add("dim")}
+      else bt.onclick=()=>answer(k,o);
+      w.append(bt);
+    });
+    b.append(w);if(done)b.append(el("p","sub","Respuesta enviada. Espera al resto…"));
+  }else if(s.ph==="rev"){
+    const o=cur(s),ps=players().sort((a,c)=>c.score-a.score),done=mine&&mine.q===s.qi;
+    const f=el("div","fb "+(done&&mine.ok?"ok":"no"),done?(mine.ok?"¡Correcto! ✓":"Casi… ✗"):"Sin respuesta ⏰");
+    b.append(f,el("div","note","Respuesta: "+o.opts.find(x=>x.ok).t),el("span","chip","+"+(done?mine.pts:0)+" puntos · total "+pscore));
+    const r=ps.findIndex(p=>p.isMe);
+    if(r>=0)b.append(el("p","sub","Vas en el lugar "+(r+1)+" de "+ps.length));
+    b.append(lbox(ps,5),el("p","small","Esperando la siguiente pregunta…"));
+  }else{
+    const ps=players(),r=ps.sort((a,c)=>c.score-a.score).findIndex(p=>p.isMe);
+    b.append(el("div","emoji",r===0?"🏆":"🎉"),el("h1","","¡Fin del juego!"),el("div","big",pscore+" pts"));
+    if(r>=0)b.append(el("p","sub","Terminaste en el lugar "+(r+1)+" de "+ps.length+"."));
+    b.append(lbox(ps,8));
+  }
+  if(!s||s.ph!=="end"){const x=el("button","btn alt","Salir");x.onclick=()=>leaveGame();b.append(x)}
+  else{const x=el("button","btn alt","Volver al inicio");x.onclick=()=>{leaveGame();show("start")};b.append(x)}
+}
+window.addEventListener("pagehide",()=>{if(cli&&role==="p"&&code&&myId){try{pub(T("p/"+myId),null,true)}catch(e){}}});
+$("onl").onclick=()=>{player=$("name").value.trim();ost("");show("online");loadFB().catch(()=>{})};
+$("oback").onclick=()=>show("start");
+$("mk").onclick=hostGame;
+$("join").onclick=joinGame;
+$("code").addEventListener("keydown",e=>{if(e.key==="Enter")joinGame()});
+$("lback").onclick=()=>show("start");
+$("lonl").onclick=()=>{ost("");show("online");loadFB().catch(()=>{})};
+
+// ================= APP INSTALABLE =================
+if("serviceWorker" in navigator&&location.protocol==="https:")addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+(()=>{
+  const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+  if(standalone)return;
+  let dp=null;const ib=$("inst"),hint=$("insthint");
+  addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;ib.style.display=""});
+  ib.onclick=async()=>{if(!dp)return;dp.prompt();try{await dp.userChoice}catch(e){}dp=null;ib.style.display="none"};
+  addEventListener("appinstalled",()=>{ib.style.display="none";hint.style.display="none"});
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  if(ios){hint.textContent="📲 Para instalar la app: toca Compartir ⬆️ y luego «Agregar a inicio».";hint.style.display=""}
+})();
+</script>
+</body>
+</html>
